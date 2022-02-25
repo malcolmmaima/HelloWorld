@@ -25,11 +25,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun startAsyncWork() {
         test++
-        if (test < 10) {
+        if (test < 1000) {
             Thread(Runnable {
                 SystemClock.sleep(3000)
                 runOnUiThread {
-                    binding.btn.text = "Thread: $test"
+                    binding.btn.text = "Count: $test threads: ${Thread.activeCount()}"
+
+                    //change background color in sequence
+                    if (test % 2 == 0) {
+                        binding.mainActivity.setBackgroundColor(resources.getColor(R.color.purple_200))
+                    } else {
+                        binding.mainActivity.setBackgroundColor(resources.getColor(R.color.purple_700))
+                    }
                     startAsyncWork()
                 }
             }).start()
