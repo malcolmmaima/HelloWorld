@@ -2,41 +2,41 @@ package com.myapp.helloworld
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.SystemClock
+import android.os.SystemClock.currentThreadTimeMillis
 import androidx.appcompat.app.AppCompatActivity
 import com.myapp.helloworld.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private var myImage: Drawable? = null
+    private var test: Int = 0
 
-    /** Leak
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.textview.text = "Hello World!"
-
-        if(myImage == null) {
-            myImage = resources.getDrawable(R.drawable.ic_launcher_background)
+        binding.btn.setOnClickListener {
+            startAsyncWork()
         }
-        binding.textview.setBackgroundDrawable(myImage)
     }
-    **/
 
-    /** No Leak
-     *
-     **/
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-
-        binding.textview.text = "Hello World!"
-
-        if(myImage == null) {
-            myImage = getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background, applicationContext.resources.newTheme())
+    private fun startAsyncWork() {
+        test++
+        if (test < 10) {
+            Thread(Runnable {
+                SystemClock.sleep(3000)
+                runOnUiThread {
+                    binding.btn.text = "Thread: $test"
+                    startAsyncWork()
+                }
+            }).start()
+        } else {
+            Thread.currentThread().interrupt()
+            binding.btn.text = "Threads stopped at: $test"
+            test = 0
         }
-        binding.imageView.setImageDrawable(myImage)
     }
 }
